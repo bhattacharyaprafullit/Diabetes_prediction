@@ -1,0 +1,33 @@
+name: prafullit-project
+
+services:
+  nginx:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+      - 81:81
+    volumes:
+      - ./nginx-data:/data
+      - ./nginx-letsencrypt:/etc/letsencrypt
+      - ./nginx-snippets:/snippets:ro
+    environment:
+      TZ: 'Asia/Kolkata'
+  
+  app:
+    build: .
+    container_name: streamlit-app
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV=production
+    volumes:
+      - ./app:/app
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
